@@ -1,11 +1,8 @@
 #include "modbus_ascii.h"
 
-
-uint8_t readMsg(uint8_t* fromBuff, uint8_t len_buff, uint8_t* toMsg){
-	return lookForMsg(fromBuff, len_buff, toMsg);
-}
-
+// return len data in "toBuffer"
 uint8_t writeMsg(uint8_t* fromMsg, uint8_t len_msg, uint8_t* toBuffer){
+	
 	uint8_t cnt = 0;
 	uint8_t cnt2 = 1; // [0] = ':'
 	uint8_t lrc = 0;
@@ -28,6 +25,7 @@ uint8_t writeMsg(uint8_t* fromMsg, uint8_t len_msg, uint8_t* toBuffer){
 	cnt2 += 2;
 	toBuffer[cnt2] = 13;
 	toBuffer[cnt2+1] = 10;
+	return cnt2 + 2;
 }
 
 // Make this method !!!!
@@ -46,25 +44,26 @@ void convertUint8_tToHex(uint8_t data, uint8_t* symbol_MSB, uint8_t* symbol_LSB)
 		*symbol_LSB = *symbol_LSB - 10 + 65;
 }
 
-uint8_t lookForMsg(uint8_t* buff, uint8_t len, uint8_t* msg){
+// return len of "toMsg"
+uint8_t readMsg(uint8_t* fromBuff, uint8_t len_buff, uint8_t* toMsg){
 		
 	uint8_t cnt = 0;
 	uint8_t cnt2 = 0;
 	uint8_t flagMsg = 0;
 	uint8_t lrc = 0;
 	
-	while (cnt < len){
+	while (cnt < len_buff){
 	
-		if (buff[cnt++] == ':'){
-			for (cnt2=0; cnt < len; cnt++){
+		if (fromBuff[cnt++] == ':'){
+			for (cnt2=0; cnt < len_buff; cnt++){
 				
 				// if end of msg
-				if (buff[cnt] == 13){
+				if (fromBuff[cnt] == 13){
 					flagMsg = 1;
 					break;
 				}
 				else{
-					msg[cnt2++] = buff[cnt];
+					toMsg[cnt2++] = fromBuff[cnt];
 				}
 			}
 			
@@ -72,17 +71,15 @@ uint8_t lookForMsg(uint8_t* buff, uint8_t len, uint8_t* msg){
 			if (flagMsg == 1){
 				//printf ("%s\n", msg);
 				for(cnt=0; cnt < cnt2;){
-					lrc += convertModbusASCIItoDec(msg[cnt], msg[cnt+1]);
+					lrc += convertModbusASCIItoDec(toMsg[cnt], toMsg[cnt+1]);
 					cnt += 2;
 				}
 				if (lrc != 0)
 					flagMsg = 0;
 			}
-		}
-		
+		}	
 	}
-		
-	return flagMsg;
+	return cnt2;
 }
 
 // good

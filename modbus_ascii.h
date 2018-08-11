@@ -6,6 +6,7 @@
 // external metods
 uint8_t readMsg(uint8_t* fromBuff, uint8_t len_buff, uint8_t* toMsg);
 uint8_t writeMsg(uint8_t* fromMsg, uint8_t len_msg, uint8_t* toBuffer);
+uint8_t parserMsg(uint8_t* fromMsg, uint8_t len_msg, uint8_t* toBuffer);
 
 // inner methods
 uint8_t convertModbusASCIItoDec(uint8_t symbol_1, uint8_t symbol_2);

@@ -82,6 +82,24 @@ uint8_t readMsg(uint8_t* fromBuff, uint8_t len_buff, uint8_t* toMsg){
 	return cnt2;
 }
 
+// return cnt = len of msg
+uint8_t parserMsg(uint8_t* fromMsg, uint8_t len_msg, uint8_t* toBuffer){
+	
+	uint8_t cnt = 0;
+	uint8_t cnt2 = 0;
+
+	
+	while (cnt < len_msg){
+		
+		if ((fromMsg[cnt] == 0) || (fromMsg[cnt] == 13) || (fromMsg[cnt] == 10))
+			break;
+		
+		toBuffer[cnt2++] = convertModbusASCIItoDec(fromMsg[cnt], fromMsg[cnt+1]);
+		cnt += 2;
+	}
+	return cnt2;
+}
+
 // good
 uint8_t convertModbusASCIItoDec(uint8_t symbol_1, uint8_t symbol_2){
 	if (symbol_1 >= '0' && symbol_1 <= '9')
